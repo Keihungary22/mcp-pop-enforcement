@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-pop-enforcement"
+version = "0.1.0"
+description = "Standalone OAuth 2.0 + DPoP enforcement prototype for MCP"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp==2.3.0",
+    "cryptography>=46.0.0,<51.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0,<10.0",
+    "ruff>=0.13,<1.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["mock_client*", "mock_mcp*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.format]
+quote-style = "double"
