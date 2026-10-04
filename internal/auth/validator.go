@@ -14,10 +14,17 @@ var (
 	ErrInsufficientScope = errors.New("insufficient scope")
 )
 
+// Confirmation contains proof-of-possession key confirmation data.
+// ConfirmationはProof-of-Possession KeyのConfirmation情報を保持する。
+type Confirmation struct {
+	JKT string `json:"jkt"`
+}
+
 // Claims represents the access-token claims required by the baseline.
 // ClaimsはBaselineで必要となるAccess Token Claimを表す。
 type Claims struct {
-	Scope string `json:"scope"`
+	Scope string        `json:"scope"`
+	CNF   *Confirmation `json:"cnf,omitempty"`
 	jwt.RegisteredClaims
 }
 

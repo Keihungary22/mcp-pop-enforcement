@@ -3,9 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/Keihungary22/mcp-pop-enforcement/internal/auth"
 	"github.com/Keihungary22/mcp-pop-enforcement/internal/config"
+	"github.com/Keihungary22/mcp-pop-enforcement/internal/dpop"
+	"github.com/Keihungary22/mcp-pop-enforcement/internal/enforcement"
 	"github.com/Keihungary22/mcp-pop-enforcement/internal/gateway"
 )
 
@@ -16,7 +19,9 @@ func main() {
 		log.Fatal("ACCESS_TOKEN_PUBLIC_KEY_FILE is required")
 	}
 
-	publicKey, err := auth.LoadECDSAPublicKey(cfg.AccessTokenPublicKeyFile)
+	publicKey, err := auth.LoadECDSAPublicKey(
+		cfg.AccessTokenPublicKeyFile,
+	)
 	if err != nil {
 		log.Fatalf("load access-token public key: %v", err)
 	}
@@ -28,7 +33,16 @@ func main() {
 		cfg.RequiredScope,
 	)
 
-	authMiddleware := auth.NewMiddleware(tokenValidator)
+	proofVerifier := dpop.NewVerifier(
+		5*time.Minute,
+		30*time.Second,
+	)
+
+	enforcementMiddleware := enforcement.NewMiddleware(
+		tokenValidator,
+		proofVerifier,
+		cfg.ExpectedDPoPHTU,
+	)
 
 	mcpGateway, err := gateway.New(cfg.UpstreamMCPURL)
 	if err != nil {
@@ -42,7 +56,10 @@ func main() {
 		_, _ = w.Write([]byte("ok"))
 	})
 
-	mux.Handle("/mcp", authMiddleware.Wrap(mcpGateway))
+	mux.Handle(
+		"/mcp",
+		enforcementMiddleware.Wrap(mcpGateway),
+	)
 
 	log.Printf(
 		"PoP enforcement gateway listening on %s, upstream=%s",
