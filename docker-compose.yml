@@ -1,0 +1,24 @@
+name: mcp-pop-enforcement
+
+services:
+  mock-mcp:
+    build:
+      context: .
+      dockerfile: mock_mcp/Dockerfile
+    environment:
+      MOCK_MCP_HOST: "0.0.0.0"
+      MOCK_MCP_PORT: "9000"
+    ports:
+      - "9000:9000"
+
+  pop-enforcement:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      LISTEN_ADDR: ":9100"
+      UPSTREAM_MCP_URL: "http://mock-mcp:9000/mcp"
+    ports:
+      - "9100:9100"
+    depends_on:
+      - mock-mcp
