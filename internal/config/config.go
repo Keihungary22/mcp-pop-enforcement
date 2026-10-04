@@ -8,6 +8,7 @@ const (
 	defaultExpectedIssuer   = "https://issuer.example"
 	defaultExpectedAudience = "mcp://resource"
 	defaultRequiredScope    = "mcp:invoke"
+	defaultExpectedDPoPHTU  = "http://127.0.0.1:9100/mcp"
 )
 
 // Config contains runtime configuration.
@@ -19,6 +20,7 @@ type Config struct {
 	ExpectedIssuer           string
 	ExpectedAudience         string
 	RequiredScope            string
+	ExpectedDPoPHTU          string
 }
 
 // Load reads configuration from environment variables.
@@ -47,6 +49,10 @@ func Load() Config {
 		RequiredScope: getEnv(
 			"REQUIRED_SCOPE",
 			defaultRequiredScope,
+		),
+		ExpectedDPoPHTU: getEnv(
+			"EXPECTED_DPOP_HTU",
+			defaultExpectedDPoPHTU,
 		),
 	}
 }

@@ -22,6 +22,7 @@ services:
       EXPECTED_ISSUER: "https://issuer.example"
       EXPECTED_AUDIENCE: "mcp://resource"
       REQUIRED_SCOPE: "mcp:invoke"
+      EXPECTED_DPOP_HTU: "http://127.0.0.1:9100/mcp"
     volumes:
       - ./.dev/keys/issuer-public.pem:/run/keys/issuer-public.pem:ro
     ports:
