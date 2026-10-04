@@ -1,4 +1,4 @@
-﻿name: CI
+name: CI
 
 on:
   pull_request:
@@ -36,3 +36,39 @@ jobs:
 
       - name: Pytest
         run: python -m pytest -q
+
+  go:
+    name: Go checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+
+      - name: Go format check
+        run: test -z "$(gofmt -l .)"
+
+      - name: Go vet
+        run: go vet ./...
+
+      - name: Go test
+        run: go test ./...
+
+  docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    needs:
+      - python
+      - go
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Build Docker services
+        run: docker compose build
