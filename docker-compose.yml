@@ -18,6 +18,12 @@ services:
     environment:
       LISTEN_ADDR: ":9100"
       UPSTREAM_MCP_URL: "http://mock-mcp:9000/mcp"
+      ACCESS_TOKEN_PUBLIC_KEY_FILE: "/run/keys/issuer-public.pem"
+      EXPECTED_ISSUER: "https://issuer.example"
+      EXPECTED_AUDIENCE: "mcp://resource"
+      REQUIRED_SCOPE: "mcp:invoke"
+    volumes:
+      - ./.dev/keys/issuer-public.pem:/run/keys/issuer-public.pem:ro
     ports:
       - "9100:9100"
     depends_on:

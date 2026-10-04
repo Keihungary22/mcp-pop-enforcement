@@ -9,6 +9,7 @@ description = "Standalone OAuth 2.0 + DPoP enforcement prototype for MCP"
 requires-python = ">=3.12"
 dependencies = [
     "mcp==2.3.0",
+    "httpx2>=2.5.0",
     "cryptography>=46.0.0,<51.0.0",
 ]
 
