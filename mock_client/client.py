@@ -8,8 +8,10 @@ import base64
 import json
 import os
 
+import httpx2
 from cryptography.hazmat.primitives.asymmetric import ec
 from mcp import Client
+from mcp.client.streamable_http import streamable_http_client
 
 
 def _base64url_uint(value: int) -> str:
@@ -50,8 +52,22 @@ class MockClientAgent:
 
     async def call_tool(self, tool: str, arguments: dict[str, object]):
         """Call an MCP tool. / MCP Toolを呼び出す。"""
-        async with Client(self.downstream_mcp_url) as client:
-            return await client.call_tool(tool, arguments)
+        headers: dict[str, str] = {}
+
+        if self.access_token:
+            headers["Authorization"] = f"Bearer {self.access_token}"
+
+        async with httpx2.AsyncClient(
+            headers=headers,
+            timeout=httpx2.Timeout(30.0, read=300.0),
+        ) as http_client:
+            transport = streamable_http_client(
+                self.downstream_mcp_url,
+                http_client=http_client,
+            )
+
+            async with Client(transport) as client:
+                return await client.call_tool(tool, arguments)
 
 
 async def main() -> None:
