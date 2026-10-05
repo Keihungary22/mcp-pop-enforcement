@@ -10,11 +10,12 @@ import (
 	"github.com/Keihungary22/mcp-pop-enforcement/internal/dpop"
 )
 
-// Middleware combines access-token and DPoP proof validation.
-// MiddlewareはAccess TokenとDPoP Proofの検証を統合する。
+// Middleware combines access-token, DPoP proof, and replay validation.
+// MiddlewareはAccess Token、DPoP Proof、Replay検証を統合する。
 type Middleware struct {
 	tokenValidator *auth.Validator
 	proofVerifier  *dpop.Verifier
+	replayStore    dpop.ReplayStore
 	expectedHTU    string
 }
 
@@ -23,11 +24,13 @@ type Middleware struct {
 func NewMiddleware(
 	tokenValidator *auth.Validator,
 	proofVerifier *dpop.Verifier,
+	replayStore dpop.ReplayStore,
 	expectedHTU string,
 ) *Middleware {
 	return &Middleware{
 		tokenValidator: tokenValidator,
 		proofVerifier:  proofVerifier,
+		replayStore:    replayStore,
 		expectedHTU:    expectedHTU,
 	}
 }
@@ -113,6 +116,18 @@ func (m *Middleware) Wrap(next http.Handler) http.Handler {
 				w,
 				`invalid_dpop_proof`,
 				"DPoP key binding mismatch",
+			)
+			return
+		}
+
+		if !m.replayStore.CheckAndStore(
+			result.JKT,
+			result.JTI,
+		) {
+			writeDPoPUnauthorized(
+				w,
+				`invalid_dpop_proof`,
+				"DPoP proof replay detected",
 			)
 			return
 		}

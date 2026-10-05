@@ -38,9 +38,14 @@ func main() {
 		30*time.Second,
 	)
 
+	replayStore := dpop.NewMemoryReplayStore(
+		5 * time.Minute,
+	)
+
 	enforcementMiddleware := enforcement.NewMiddleware(
 		tokenValidator,
 		proofVerifier,
+		replayStore,
 		cfg.ExpectedDPoPHTU,
 	)
 

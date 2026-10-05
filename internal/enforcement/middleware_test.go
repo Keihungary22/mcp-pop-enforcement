@@ -145,9 +145,14 @@ func newMiddleware(
 		30*time.Second,
 	)
 
+	replayStore := dpop.NewMemoryReplayStore(
+		5 * time.Minute,
+	)
+
 	return NewMiddleware(
 		tokenValidator,
 		proofVerifier,
+		replayStore,
 		testExpectedHTU,
 	)
 }
@@ -472,5 +477,69 @@ func TestMiddlewareRejectsInsufficientScope(t *testing.T) {
 
 	if called {
 		t.Fatal("downstream handler must not be called")
+	}
+}
+
+func TestMiddlewareRejectsReplayedProof(t *testing.T) {
+	issuerKey := generateTestKey(t)
+	clientKey := generateTestKey(t)
+
+	jkt, err := publicJWK(clientKey).Thumbprint()
+	if err != nil {
+		t.Fatalf("calculate JWK thumbprint: %v", err)
+	}
+
+	accessToken := signAccessToken(
+		t,
+		issuerKey,
+		jkt,
+		testScope,
+		true,
+	)
+
+	proof := signDPoPProof(
+		t,
+		clientKey,
+		accessToken,
+	)
+
+	middleware := newMiddleware(t, issuerKey)
+
+	firstStatus, firstCalled := executeRequest(
+		t,
+		middleware,
+		"DPoP "+accessToken,
+		proof,
+	)
+
+	if firstStatus != http.StatusNoContent {
+		t.Fatalf(
+			"expected first status %d, got %d",
+			http.StatusNoContent,
+			firstStatus,
+		)
+	}
+
+	if !firstCalled {
+		t.Fatal("expected first request to reach downstream")
+	}
+
+	secondStatus, secondCalled := executeRequest(
+		t,
+		middleware,
+		"DPoP "+accessToken,
+		proof,
+	)
+
+	if secondStatus != http.StatusUnauthorized {
+		t.Fatalf(
+			"expected replay status %d, got %d",
+			http.StatusUnauthorized,
+			secondStatus,
+		)
+	}
+
+	if secondCalled {
+		t.Fatal("replayed proof must not reach downstream")
 	}
 }
