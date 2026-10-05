@@ -13,7 +13,7 @@ import (
 // Middleware combines access-token, DPoP proof, and replay validation.
 // MiddlewareはAccess Token、DPoP Proof、Replay検証を統合する。
 type Middleware struct {
-	tokenValidator *auth.Validator
+	tokenValidator auth.TokenValidator
 	proofVerifier  *dpop.Verifier
 	replayStore    dpop.ReplayStore
 	expectedHTU    string
@@ -22,7 +22,7 @@ type Middleware struct {
 // NewMiddleware creates DPoP-bound resource protection middleware.
 // NewMiddlewareはDPoP-bound Resource Protection Middlewareを作成する。
 func NewMiddleware(
-	tokenValidator *auth.Validator,
+	tokenValidator auth.TokenValidator,
 	proofVerifier *dpop.Verifier,
 	replayStore dpop.ReplayStore,
 	expectedHTU string,

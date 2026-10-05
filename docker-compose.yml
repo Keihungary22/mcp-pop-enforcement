@@ -1,6 +1,19 @@
 name: mcp-pop-enforcement
 
 services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.0
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    ports:
+      - "8080:8080"
+
   mock-mcp:
     build:
       context: .
@@ -18,14 +31,13 @@ services:
     environment:
       LISTEN_ADDR: ":9100"
       UPSTREAM_MCP_URL: "http://mock-mcp:9000/mcp"
-      ACCESS_TOKEN_PUBLIC_KEY_FILE: "/run/keys/issuer-public.pem"
-      EXPECTED_ISSUER: "https://issuer.example"
-      EXPECTED_AUDIENCE: "mcp://resource"
+      ACCESS_TOKEN_JWKS_URL: "http://keycloak:8080/realms/mcp-pop/protocol/openid-connect/certs"
+      EXPECTED_ISSUER: "http://127.0.0.1:8080/realms/mcp-pop"
+      EXPECTED_AUDIENCE: "mcp-resource"
       REQUIRED_SCOPE: "mcp:invoke"
       EXPECTED_DPOP_HTU: "http://127.0.0.1:9100/mcp"
-    volumes:
-      - ./.dev/keys/issuer-public.pem:/run/keys/issuer-public.pem:ro
     ports:
       - "9100:9100"
     depends_on:
+      - keycloak
       - mock-mcp

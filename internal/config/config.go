@@ -17,6 +17,7 @@ type Config struct {
 	ListenAddr               string
 	UpstreamMCPURL           string
 	AccessTokenPublicKeyFile string
+	AccessTokenJWKSURL       string
 	ExpectedIssuer           string
 	ExpectedAudience         string
 	RequiredScope            string
@@ -37,6 +38,9 @@ func Load() Config {
 		),
 		AccessTokenPublicKeyFile: os.Getenv(
 			"ACCESS_TOKEN_PUBLIC_KEY_FILE",
+		),
+		AccessTokenJWKSURL: os.Getenv(
+			"ACCESS_TOKEN_JWKS_URL",
 		),
 		ExpectedIssuer: getEnv(
 			"EXPECTED_ISSUER",

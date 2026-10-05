@@ -15,23 +15,52 @@ import (
 func main() {
 	cfg := config.Load()
 
-	if cfg.AccessTokenPublicKeyFile == "" {
-		log.Fatal("ACCESS_TOKEN_PUBLIC_KEY_FILE is required")
-	}
+	var tokenValidator auth.TokenValidator
 
-	publicKey, err := auth.LoadECDSAPublicKey(
-		cfg.AccessTokenPublicKeyFile,
-	)
-	if err != nil {
-		log.Fatalf("load access-token public key: %v", err)
-	}
+	if cfg.AccessTokenJWKSURL != "" {
+		resolver := auth.NewJWKSResolver(
+			cfg.AccessTokenJWKSURL,
+		)
 
-	tokenValidator := auth.NewValidator(
-		publicKey,
-		cfg.ExpectedIssuer,
-		cfg.ExpectedAudience,
-		cfg.RequiredScope,
-	)
+		tokenValidator = auth.NewJWKSValidator(
+			resolver,
+			cfg.ExpectedIssuer,
+			cfg.ExpectedAudience,
+			cfg.RequiredScope,
+		)
+
+		log.Printf(
+			"access-token validation mode: JWKS (%s)",
+			cfg.AccessTokenJWKSURL,
+		)
+	} else {
+		if cfg.AccessTokenPublicKeyFile == "" {
+			log.Fatal(
+				"ACCESS_TOKEN_JWKS_URL or ACCESS_TOKEN_PUBLIC_KEY_FILE is required",
+			)
+		}
+
+		publicKey, err := auth.LoadECDSAPublicKey(
+			cfg.AccessTokenPublicKeyFile,
+		)
+		if err != nil {
+			log.Fatalf(
+				"load access-token public key: %v",
+				err,
+			)
+		}
+
+		tokenValidator = auth.NewValidator(
+			publicKey,
+			cfg.ExpectedIssuer,
+			cfg.ExpectedAudience,
+			cfg.RequiredScope,
+		)
+
+		log.Printf(
+			"access-token validation mode: static public key",
+		)
+	}
 
 	proofVerifier := dpop.NewVerifier(
 		5*time.Minute,
@@ -56,7 +85,10 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
+	mux.HandleFunc("/healthz", func(
+		w http.ResponseWriter,
+		_ *http.Request,
+	) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
 	})
@@ -72,7 +104,10 @@ func main() {
 		cfg.UpstreamMCPURL,
 	)
 
-	if err := http.ListenAndServe(cfg.ListenAddr, mux); err != nil {
+	if err := http.ListenAndServe(
+		cfg.ListenAddr,
+		mux,
+	); err != nil {
 		log.Fatalf("server stopped: %v", err)
 	}
 }
