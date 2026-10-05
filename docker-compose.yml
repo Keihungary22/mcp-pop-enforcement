@@ -9,6 +9,7 @@ services:
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: "http://host.docker.internal:8080"
     volumes:
       - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
     ports:
@@ -31,8 +32,11 @@ services:
     environment:
       LISTEN_ADDR: ":9100"
       UPSTREAM_MCP_URL: "http://mock-mcp:9000/mcp"
-      ACCESS_TOKEN_JWKS_URL: "http://keycloak:8080/realms/mcp-pop/protocol/openid-connect/certs"
-      EXPECTED_ISSUER: "http://127.0.0.1:8080/realms/mcp-pop"
+      ACCESS_TOKEN_JWKS_URL: "http://host.docker.internal:8080/realms/mcp-pop/protocol/openid-connect/certs"
+      ACCESS_TOKEN_INTROSPECTION_URL: "http://host.docker.internal:8080/realms/mcp-pop/protocol/openid-connect/token/introspect"
+      INTROSPECTION_CLIENT_ID: "mcp-resource"
+      INTROSPECTION_CLIENT_SECRET: "mcp-resource-secret"
+      EXPECTED_ISSUER: "http://host.docker.internal:8080/realms/mcp-pop"
       EXPECTED_AUDIENCE: "mcp-resource"
       REQUIRED_SCOPE: "mcp:invoke"
       EXPECTED_DPOP_HTU: "http://127.0.0.1:9100/mcp"

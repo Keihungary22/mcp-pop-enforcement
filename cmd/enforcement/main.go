@@ -62,6 +62,27 @@ func main() {
 		)
 	}
 
+	if cfg.AccessTokenIntrospectionURL != "" {
+		if cfg.IntrospectionClientID == "" ||
+			cfg.IntrospectionClientSecret == "" {
+			log.Fatal(
+				"INTROSPECTION_CLIENT_ID and INTROSPECTION_CLIENT_SECRET are required when introspection is enabled",
+			)
+		}
+
+		tokenValidator = auth.NewIntrospectionValidator(
+			tokenValidator,
+			cfg.AccessTokenIntrospectionURL,
+			cfg.IntrospectionClientID,
+			cfg.IntrospectionClientSecret,
+		)
+
+		log.Printf(
+			"access-token revocation checking enabled via introspection (%s)",
+			cfg.AccessTokenIntrospectionURL,
+		)
+	}
+
 	proofVerifier := dpop.NewVerifier(
 		5*time.Minute,
 		30*time.Second,
