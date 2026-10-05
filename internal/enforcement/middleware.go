@@ -3,6 +3,7 @@ package enforcement
 import (
 	"crypto/subtle"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -53,6 +54,11 @@ func (m *Middleware) Wrap(next http.Handler) http.Handler {
 
 		claims, err := m.tokenValidator.Validate(accessToken)
 		if err != nil {
+			log.Printf(
+				"access-token validation failed: %T: %v",
+				err,
+				err,
+			)
 			if errors.Is(err, auth.ErrInsufficientScope) {
 				w.Header().Set(
 					"WWW-Authenticate",

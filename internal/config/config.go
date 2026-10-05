@@ -14,14 +14,17 @@ const (
 // Config contains runtime configuration.
 // Configは実行時設定を保持する。
 type Config struct {
-	ListenAddr               string
-	UpstreamMCPURL           string
-	AccessTokenPublicKeyFile string
-	AccessTokenJWKSURL       string
-	ExpectedIssuer           string
-	ExpectedAudience         string
-	RequiredScope            string
-	ExpectedDPoPHTU          string
+	ListenAddr                  string
+	UpstreamMCPURL              string
+	AccessTokenPublicKeyFile    string
+	AccessTokenJWKSURL          string
+	AccessTokenIntrospectionURL string
+	IntrospectionClientID       string
+	IntrospectionClientSecret   string
+	ExpectedIssuer              string
+	ExpectedAudience            string
+	RequiredScope               string
+	ExpectedDPoPHTU             string
 }
 
 // Load reads configuration from environment variables.
@@ -41,6 +44,15 @@ func Load() Config {
 		),
 		AccessTokenJWKSURL: os.Getenv(
 			"ACCESS_TOKEN_JWKS_URL",
+		),
+		AccessTokenIntrospectionURL: os.Getenv(
+			"ACCESS_TOKEN_INTROSPECTION_URL",
+		),
+		IntrospectionClientID: os.Getenv(
+			"INTROSPECTION_CLIENT_ID",
+		),
+		IntrospectionClientSecret: os.Getenv(
+			"INTROSPECTION_CLIENT_SECRET",
 		),
 		ExpectedIssuer: getEnv(
 			"EXPECTED_ISSUER",
