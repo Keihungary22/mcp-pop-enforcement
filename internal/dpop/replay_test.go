@@ -47,3 +47,26 @@ func TestMemoryReplayStoreExpiresEntries(t *testing.T) {
 		t.Fatal("expected expired replay entry to be accepted again")
 	}
 }
+
+func TestMemoryReplayStoreRetainsFutureDatedProof(t *testing.T) {
+	now := time.Now().Truncate(time.Second)
+
+	store := NewMemoryReplayStore(5*time.Minute + 30*time.Second)
+	store.now = func() time.Time { return now }
+
+	if !store.CheckAndStore("key-a", "future-jti") {
+		t.Fatal("expected first proof to be accepted")
+	}
+
+	now = now.Add(301 * time.Second)
+
+	if store.CheckAndStore("key-a", "future-jti") {
+		t.Fatal("replay accepted while proof may still be valid")
+	}
+
+	now = now.Add(30 * time.Second)
+
+	if !store.CheckAndStore("key-a", "future-jti") {
+		t.Fatal("expected expired entry to be reclaimed")
+	}
+}
