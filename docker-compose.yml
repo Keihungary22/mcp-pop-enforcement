@@ -22,8 +22,6 @@ services:
     environment:
       MOCK_MCP_HOST: "0.0.0.0"
       MOCK_MCP_PORT: "9000"
-    ports:
-      - "9000:9000"
 
   pop-enforcement:
     build:
