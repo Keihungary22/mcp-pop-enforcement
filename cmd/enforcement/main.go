@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Keihungary22/mcp-pop-enforcement/internal/auth"
@@ -99,7 +100,7 @@ func main() {
 		cfg.ExpectedDPoPHTU,
 	)
 
-	mcpGateway, err := gateway.New(cfg.UpstreamMCPURL)
+	mcpGateway, err := gateway.NewWithSocket(cfg.UpstreamMCPURL, os.Getenv("UPSTREAM_MCP_SOCKET"))
 	if err != nil {
 		log.Fatalf("create MCP gateway: %v", err)
 	}

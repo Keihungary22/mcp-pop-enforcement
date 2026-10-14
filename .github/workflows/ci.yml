@@ -102,6 +102,9 @@ jobs:
       - name: Wait for security stack
         run: python -m pytest tests/security/test_smoke.py -q
 
+      - name: Backend isolation regression tests
+        run: python -m pytest tests/security/test_backend_boundary.py -q
+
       - name: Security baseline tests
         run: python -m pytest tests/security/test_baseline.py -q
 

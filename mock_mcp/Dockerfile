@@ -8,9 +8,6 @@ COPY mock_client ./mock_client
 
 RUN python -m pip install --no-cache-dir .
 
-ENV MOCK_MCP_HOST=0.0.0.0
-ENV MOCK_MCP_PORT=9000
-
-EXPOSE 9000
+ENV MOCK_MCP_SOCKET=/run/mcp/backend.sock
 
 CMD ["python", "-m", "mock_mcp.server"]

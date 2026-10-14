@@ -25,7 +25,7 @@ PoP Enforcement Service
         |
         v
 Mock MCP Service
-  mock-mcp:9000 (Docker internal only)
+  /run/mcp/backend.sock (shared Unix domain socket)
 ```
 
 Default values are development defaults only and must be replaceable through
@@ -69,11 +69,12 @@ http://127.0.0.1:9100/mcp
 ```
 
 The protected endpoint for host-based clients is `http://127.0.0.1:9100/mcp`.
-The internal upstream endpoint is `http://mock-mcp:9000/mcp`.
-The Mock MCP backend is not published to the host.
+In Docker Compose, the enforcement service forwards authorized requests
+over the shared Unix domain socket `/run/mcp/backend.sock`.
+The Mock MCP backend does not listen on TCP port 9000.
+Only the protected Gateway endpoint is published to the host.
 
-The enforcement service forwards an authorized request to this upstream MCP
-endpoint only after OAuth access-token and DPoP validation succeeds.
+Forwarding occurs only after OAuth access-token and DPoP validation succeeds.
 
 ## 5. Authorization Headers
 
@@ -147,7 +148,7 @@ Development defaults:
 | --- | --- |
 | Mock Client | `http://localhost:8002` |
 | PoP Enforcement | `http://localhost:9100` |
-| Mock MCP (Docker internal) | `http://mock-mcp:9000` |
+| Mock MCP (Docker Compose) | `/run/mcp/backend.sock` (UDS) |
 | MCP endpoint | `http://127.0.0.1:9100/mcp` |
 
 These values are not part of the security model and must remain configurable.
@@ -162,6 +163,7 @@ ENFORCEMENT_HOST=0.0.0.0
 ENFORCEMENT_PORT=9100
 
 UPSTREAM_MCP_URL=http://mock-mcp:9000/mcp
+UPSTREAM_MCP_SOCKET=/run/mcp/backend.sock
 
 OAUTH_ISSUER_URL=<issuer>
 OAUTH_AUDIENCE=<audience>
@@ -169,6 +171,11 @@ OAUTH_AUDIENCE=<audience>
 DPoP_IAT_WINDOW_SECONDS=<window>
 DPoP_REPLAY_WINDOW_SECONDS=<window>
 ```
+
+In Docker Compose, `UPSTREAM_MCP_SOCKET` selects the Unix socket
+transport; `UPSTREAM_MCP_URL` supplies the logical HTTP target and
+MCP path. Without the socket setting, the standalone Gateway retains
+its regular TCP/HTTP transport.
 
 Keycloak-specific configuration will be introduced when the OAuth provider is
 added.
