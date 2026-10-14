@@ -1,4 +1,4 @@
-﻿# Standalone PoP Prototype Interface Specification
+# Standalone PoP Prototype Interface Specification
 
 ## 1. Purpose
 
@@ -25,7 +25,7 @@ PoP Enforcement Service
         |
         v
 Mock MCP Service
-  localhost:9000
+  /run/mcp/backend.sock (shared Unix domain socket)
 ```
 
 Default values are development defaults only and must be replaceable through
@@ -65,11 +65,16 @@ The MCP service endpoint is:
 Standalone default:
 
 ```text
-http://localhost:9000/mcp
+http://127.0.0.1:9100/mcp
 ```
 
-The enforcement service forwards an authorized request to this upstream MCP
-endpoint only after OAuth access-token and DPoP validation succeeds.
+The protected endpoint for host-based clients is `http://127.0.0.1:9100/mcp`.
+In Docker Compose, the enforcement service forwards authorized requests
+over the shared Unix domain socket `/run/mcp/backend.sock`.
+The Mock MCP backend does not listen on TCP port 9000.
+Only the protected Gateway endpoint is published to the host.
+
+Forwarding occurs only after OAuth access-token and DPoP validation succeeds.
 
 ## 5. Authorization Headers
 
@@ -143,8 +148,8 @@ Development defaults:
 | --- | --- |
 | Mock Client | `http://localhost:8002` |
 | PoP Enforcement | `http://localhost:9100` |
-| Mock MCP | `http://localhost:9000` |
-| MCP endpoint | `http://localhost:9000/mcp` |
+| Mock MCP (Docker Compose) | `/run/mcp/backend.sock` (UDS) |
+| MCP endpoint | `http://127.0.0.1:9100/mcp` |
 
 These values are not part of the security model and must remain configurable.
 
@@ -157,7 +162,8 @@ to:
 ENFORCEMENT_HOST=0.0.0.0
 ENFORCEMENT_PORT=9100
 
-UPSTREAM_MCP_URL=http://localhost:9000/mcp
+UPSTREAM_MCP_URL=http://mock-mcp:9000/mcp
+UPSTREAM_MCP_SOCKET=/run/mcp/backend.sock
 
 OAUTH_ISSUER_URL=<issuer>
 OAUTH_AUDIENCE=<audience>
@@ -165,6 +171,11 @@ OAUTH_AUDIENCE=<audience>
 DPoP_IAT_WINDOW_SECONDS=<window>
 DPoP_REPLAY_WINDOW_SECONDS=<window>
 ```
+
+In Docker Compose, `UPSTREAM_MCP_SOCKET` selects the Unix socket
+transport; `UPSTREAM_MCP_URL` supplies the logical HTTP target and
+MCP path. Without the socket setting, the standalone Gateway retains
+its regular TCP/HTTP transport.
 
 Keycloak-specific configuration will be introduced when the OAuth provider is
 added.

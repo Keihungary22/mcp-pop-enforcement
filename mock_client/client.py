@@ -162,7 +162,7 @@ class MockClientAgent:
     ) -> None:
         self.downstream_mcp_url = downstream_mcp_url or os.getenv(
             "DOWNSTREAM_MCP_URL",
-            "http://127.0.0.1:9000/mcp",
+            "http://127.0.0.1:9100/mcp",
         )
 
         self.access_token = (
