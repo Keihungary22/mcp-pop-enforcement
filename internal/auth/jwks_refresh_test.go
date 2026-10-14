@@ -283,3 +283,81 @@ func TestJWKSResolverCachedKeySurvivesRefreshFailure(t *testing.T) {
 		t.Fatalf("expected two JWKS fetches, got %d", got)
 	}
 }
+
+func TestJWKSResolverCancelWhileRefreshInFlight(t *testing.T) {
+	started := make(chan struct{})
+	release := make(chan struct{})
+	var releaseOnce sync.Once
+
+	unblock := func() {
+		releaseOnce.Do(func() { close(release) })
+	}
+	defer unblock()
+
+	var fetches atomic.Int32
+
+	server := httptest.NewServer(http.HandlerFunc(func(
+		w http.ResponseWriter,
+		r *http.Request,
+	) {
+		if fetches.Add(1) == 1 {
+			close(started)
+		}
+
+		<-release
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"keys":[]}`))
+	}))
+	defer server.Close()
+
+	resolver := NewJWKSResolver(server.URL)
+
+	firstDone := make(chan error, 1)
+	go func() {
+		_, err := resolver.Resolve(context.Background(), "first-unknown")
+		firstDone <- err
+	}()
+
+	select {
+	case <-started:
+	case <-time.After(2 * time.Second):
+		t.Fatal("first JWKS request did not start")
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	secondDone := make(chan error, 1)
+	go func() {
+		_, err := resolver.Resolve(ctx, "second-unknown")
+		secondDone <- err
+	}()
+
+	// Give the second request time to reach the occupied refresh gate.
+	time.Sleep(50 * time.Millisecond)
+	cancel()
+
+	select {
+	case err := <-secondDone:
+		if !errors.Is(err, context.Canceled) {
+			t.Fatalf("expected context.Canceled, got %v", err)
+		}
+	case <-time.After(1 * time.Second):
+		t.Fatal("canceled request remained blocked behind JWKS refresh")
+	}
+
+	if got := fetches.Load(); got != 1 {
+		t.Fatalf("expected only one JWKS HTTP request, got %d", got)
+	}
+
+	unblock()
+
+	select {
+	case err := <-firstDone:
+		if !errors.Is(err, ErrJWKSKeyNotFound) {
+			t.Fatalf("unexpected first request result: %v", err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("first JWKS request did not complete")
+	}
+}

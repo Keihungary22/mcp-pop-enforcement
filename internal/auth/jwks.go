@@ -45,6 +45,7 @@ type JWKSResolver struct {
 	mu              sync.RWMutex
 	keys            map[string]*rsa.PublicKey
 	refreshMu       sync.Mutex
+	refreshGate     chan struct{}
 	refreshInterval time.Duration
 	lastRefresh     time.Time
 	lastFailure     time.Time
@@ -60,6 +61,7 @@ func NewJWKSResolver(url string) *JWKSResolver {
 		},
 		keys:            make(map[string]*rsa.PublicKey),
 		refreshInterval: 30 * time.Second,
+		refreshGate:     make(chan struct{}, 1),
 	}
 }
 
@@ -115,6 +117,13 @@ func (r *JWKSResolver) refreshIfNeeded(
 	if err := ctx.Err(); err != nil {
 		return err
 	}
+
+	select {
+	case r.refreshGate <- struct{}{}:
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+	defer func() { <-r.refreshGate }()
 
 	r.refreshMu.Lock()
 	defer r.refreshMu.Unlock()
