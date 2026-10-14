@@ -83,13 +83,17 @@ func main() {
 		)
 	}
 
+	const proofMaxAge = 5 * time.Minute
+	const proofFutureSkew = 30 * time.Second
+
 	proofVerifier := dpop.NewVerifier(
-		5*time.Minute,
-		30*time.Second,
+		proofMaxAge,
+		proofFutureSkew,
 	)
 
+	// Retain replay entries throughout the accepted proof lifetime.
 	replayStore := dpop.NewMemoryReplayStore(
-		5 * time.Minute,
+		proofMaxAge + proofFutureSkew,
 	)
 
 	enforcementMiddleware := enforcement.NewMiddleware(
