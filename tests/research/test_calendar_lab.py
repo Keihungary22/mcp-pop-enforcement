@@ -1,6 +1,7 @@
 """Issue #27: isolated calendar experiment tests."""
 
 import asyncio
+import json
 import threading
 
 import pytest
@@ -167,15 +168,24 @@ def test_calendar_tool_over_mcp_protocol() -> None:
     async def run() -> None:
         async with Client(mcp, raise_exceptions=True) as client:
             result = await client.call_tool(
-                "create_calendar_event",
+                "run_authorized_calendar_event",
                 {
-                    **make_args(mcp_lab, "mcp-1"),
+                    "invocation_id": "mcp-1",
+                    "baseline": "B2-strong",
                     "mode": "immutable",
+                    "alias": "work",
+                    "authorized_resource_id": "calendar_A",
+                    "title": "MCP protocol test",
                 },
             )
+
             assert result.is_error is False
-            assert result.structured_content is not None
-            assert result.structured_content["execution_outcome"] == "COMMITTED"
+
+            body = json.loads(result.content[0].text)
+
+            assert body["authorization_decision"] == "PERMIT"
+            assert body["execution_outcome"] == "COMMITTED"
+            assert body["actual_commit_target"] == "calendar_A"
             assert mcp_lab.commits()[0]["actual_commit_target"] == "calendar_A"
 
     asyncio.run(run())
