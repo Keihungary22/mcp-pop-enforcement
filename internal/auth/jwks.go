@@ -42,8 +42,13 @@ type JWKSResolver struct {
 	url        string
 	httpClient *http.Client
 
-	mu   sync.RWMutex
-	keys map[string]*rsa.PublicKey
+	mu              sync.RWMutex
+	keys            map[string]*rsa.PublicKey
+	refreshMu       sync.Mutex
+	refreshGate     chan struct{}
+	refreshInterval time.Duration
+	lastRefresh     time.Time
+	lastFailure     time.Time
 }
 
 // NewJWKSResolver creates a JWKS resolver.
@@ -54,7 +59,9 @@ func NewJWKSResolver(url string) *JWKSResolver {
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
-		keys: make(map[string]*rsa.PublicKey),
+		keys:            make(map[string]*rsa.PublicKey),
+		refreshInterval: 30 * time.Second,
+		refreshGate:     make(chan struct{}, 1),
 	}
 }
 
@@ -84,7 +91,7 @@ func (r *JWKSResolver) Resolve(
 		return key, nil
 	}
 
-	if err := r.refresh(ctx); err != nil {
+	if err := r.refreshIfNeeded(ctx, kid); err != nil {
 		return nil, err
 	}
 
@@ -103,6 +110,60 @@ func (r *JWKSResolver) Resolve(
 	return key, nil
 }
 
+func (r *JWKSResolver) refreshIfNeeded(
+	ctx context.Context,
+	kid string,
+) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	select {
+	case r.refreshGate <- struct{}{}:
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+	defer func() { <-r.refreshGate }()
+
+	r.refreshMu.Lock()
+	defer r.refreshMu.Unlock()
+
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+
+	// Another request may have refreshed the cache while we waited.
+	r.mu.RLock()
+	key := r.keys[kid]
+	r.mu.RUnlock()
+
+	if key != nil {
+		return nil
+	}
+
+	if !r.lastRefresh.IsZero() &&
+		time.Since(r.lastRefresh) < r.refreshInterval {
+		return nil
+	}
+
+	// Limit repeated requests while the JWKS endpoint is failing.
+	if !r.lastFailure.IsZero() &&
+		time.Since(r.lastFailure) < 2*time.Second {
+		return fmt.Errorf("JWKS refresh temporarily unavailable")
+	}
+
+	if err := r.refresh(ctx); err != nil {
+		if !errors.Is(err, context.Canceled) &&
+			!errors.Is(err, context.DeadlineExceeded) {
+			r.lastFailure = time.Now()
+		}
+		return err
+	}
+
+	r.lastRefresh = time.Now()
+	r.lastFailure = time.Time{}
+	return nil
+}
 func (r *JWKSResolver) refresh(
 	ctx context.Context,
 ) error {
