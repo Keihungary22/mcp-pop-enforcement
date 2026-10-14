@@ -1,0 +1,419 @@
+{
+  "issue": 29,
+  "policy": "fixed_authorized_target",
+  "model": "isolated_in_memory_sqlite",
+  "experiments": [
+    {
+      "experiment": "E1",
+      "case": "E1",
+      "scenario": "alias_swap",
+      "baseline": "B2-weak",
+      "execution_mode": "X1",
+      "invocation_id": "E1-swap",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_B",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_B",
+      "unauthorized_commit_count": 1,
+      "legitimate_success": false,
+      "database_commits": [
+        {
+          "invocation_id": "E1-swap",
+          "actual_commit_target": "calendar_B",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "E1-swap",
+          "resource_id": "calendar_B",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "E1-swap",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_B",
+          "execution_mode": "alias",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_B",
+          "error_type": null
+        }
+      ]
+    },
+    {
+      "experiment": "E2",
+      "case": "A",
+      "scenario": "alias_swap",
+      "baseline": "B2-weak",
+      "execution_mode": "X1",
+      "invocation_id": "A-swap",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_B",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_B",
+      "unauthorized_commit_count": 1,
+      "legitimate_success": false,
+      "database_commits": [
+        {
+          "invocation_id": "A-swap",
+          "actual_commit_target": "calendar_B",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "A-swap",
+          "resource_id": "calendar_B",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "A-swap",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_B",
+          "execution_mode": "alias",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_B",
+          "error_type": null
+        }
+      ]
+    },
+    {
+      "experiment": "E2",
+      "case": "A",
+      "scenario": "legitimate_control",
+      "baseline": "B2-weak",
+      "execution_mode": "X1",
+      "invocation_id": "A-control",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "legitimate_success": true,
+      "database_commits": [
+        {
+          "invocation_id": "A-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "A-control",
+          "resource_id": "calendar_A",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "A-control",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_A",
+          "execution_mode": "alias",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_A",
+          "error_type": null
+        }
+      ]
+    },
+    {
+      "experiment": "E2",
+      "case": "B",
+      "scenario": "alias_swap",
+      "baseline": "B2-strong",
+      "execution_mode": "X1",
+      "invocation_id": "B-swap",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_B",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_B",
+      "unauthorized_commit_count": 1,
+      "legitimate_success": false,
+      "database_commits": [
+        {
+          "invocation_id": "B-swap",
+          "actual_commit_target": "calendar_B",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "B-swap",
+          "resource_id": "calendar_B",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "B-swap",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_B",
+          "execution_mode": "alias",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_B",
+          "error_type": null
+        }
+      ]
+    },
+    {
+      "experiment": "E2",
+      "case": "B",
+      "scenario": "legitimate_control",
+      "baseline": "B2-strong",
+      "execution_mode": "X1",
+      "invocation_id": "B-control",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "legitimate_success": true,
+      "database_commits": [
+        {
+          "invocation_id": "B-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "B-control",
+          "resource_id": "calendar_A",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "B-control",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_A",
+          "execution_mode": "alias",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_A",
+          "error_type": null
+        }
+      ]
+    },
+    {
+      "experiment": "E2",
+      "case": "C",
+      "scenario": "alias_swap",
+      "baseline": "B2-weak",
+      "execution_mode": "X2",
+      "invocation_id": "C-swap",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_B",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "legitimate_success": false,
+      "database_commits": [
+        {
+          "invocation_id": "C-swap",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "C-swap",
+          "resource_id": "calendar_A",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "C-swap",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_B",
+          "execution_mode": "immutable",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_A",
+          "error_type": null
+        }
+      ]
+    },
+    {
+      "experiment": "E2",
+      "case": "C",
+      "scenario": "legitimate_control",
+      "baseline": "B2-weak",
+      "execution_mode": "X2",
+      "invocation_id": "C-control",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "legitimate_success": true,
+      "database_commits": [
+        {
+          "invocation_id": "C-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "C-control",
+          "resource_id": "calendar_A",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "C-control",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_A",
+          "execution_mode": "immutable",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_A",
+          "error_type": null
+        }
+      ]
+    },
+    {
+      "experiment": "E2",
+      "case": "D",
+      "scenario": "alias_swap",
+      "baseline": "B2-strong",
+      "execution_mode": "X2",
+      "invocation_id": "D-swap",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_B",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "legitimate_success": false,
+      "database_commits": [
+        {
+          "invocation_id": "D-swap",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "D-swap",
+          "resource_id": "calendar_A",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "D-swap",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_B",
+          "execution_mode": "immutable",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_A",
+          "error_type": null
+        }
+      ]
+    },
+    {
+      "experiment": "E2",
+      "case": "D",
+      "scenario": "legitimate_control",
+      "baseline": "B2-strong",
+      "execution_mode": "X2",
+      "invocation_id": "D-control",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "legitimate_success": true,
+      "database_commits": [
+        {
+          "invocation_id": "D-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "D-control",
+          "resource_id": "calendar_A",
+          "title": "E1/E2 experiment"
+        }
+      ],
+      "execution_logs": [
+        {
+          "log_id": 1,
+          "invocation_id": "D-control",
+          "requested_tool": "create_calendar_event",
+          "arguments_json": "{\"alias\": \"work\", \"title\": \"E1/E2 experiment\"}",
+          "authorized_resource_id": "calendar_A",
+          "alias_at_authorization": "calendar_A",
+          "alias_at_execution": "calendar_A",
+          "execution_mode": "immutable",
+          "execution_outcome": "COMMITTED",
+          "actual_commit_target": "calendar_A",
+          "error_type": null
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "e1_unauthorized_commit_count": 1,
+    "e2_unauthorized_commit_count": 2,
+    "legitimate_operation_success_rate": 1.0,
+    "legitimate_successes": 4,
+    "legitimate_attempts": 4
+  }
+}
