@@ -1,4 +1,4 @@
-﻿# Standalone PoP Prototype Interface Specification
+# Standalone PoP Prototype Interface Specification
 
 ## 1. Purpose
 
@@ -25,7 +25,7 @@ PoP Enforcement Service
         |
         v
 Mock MCP Service
-  localhost:9000
+  mock-mcp:9000 (Docker internal only)
 ```
 
 Default values are development defaults only and must be replaceable through
@@ -65,8 +65,12 @@ The MCP service endpoint is:
 Standalone default:
 
 ```text
-http://localhost:9000/mcp
+http://localhost:9100/mcp
 ```
+
+The protected endpoint for host-based clients is `http://localhost:9100/mcp`.
+The internal upstream endpoint is `http://mock-mcp:9000/mcp`.
+The Mock MCP backend is not published to the host.
 
 The enforcement service forwards an authorized request to this upstream MCP
 endpoint only after OAuth access-token and DPoP validation succeeds.
@@ -143,8 +147,8 @@ Development defaults:
 | --- | --- |
 | Mock Client | `http://localhost:8002` |
 | PoP Enforcement | `http://localhost:9100` |
-| Mock MCP | `http://localhost:9000` |
-| MCP endpoint | `http://localhost:9000/mcp` |
+| Mock MCP (Docker internal) | `http://mock-mcp:9000` |
+| MCP endpoint | `http://localhost:9100/mcp` |
 
 These values are not part of the security model and must remain configurable.
 
@@ -157,7 +161,7 @@ to:
 ENFORCEMENT_HOST=0.0.0.0
 ENFORCEMENT_PORT=9100
 
-UPSTREAM_MCP_URL=http://localhost:9000/mcp
+UPSTREAM_MCP_URL=http://mock-mcp:9000/mcp
 
 OAUTH_ISSUER_URL=<issuer>
 OAUTH_AUDIENCE=<audience>
