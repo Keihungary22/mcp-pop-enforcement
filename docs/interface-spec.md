@@ -65,10 +65,10 @@ The MCP service endpoint is:
 Standalone default:
 
 ```text
-http://localhost:9100/mcp
+http://127.0.0.1:9100/mcp
 ```
 
-The protected endpoint for host-based clients is `http://localhost:9100/mcp`.
+The protected endpoint for host-based clients is `http://127.0.0.1:9100/mcp`.
 The internal upstream endpoint is `http://mock-mcp:9000/mcp`.
 The Mock MCP backend is not published to the host.
 
@@ -148,7 +148,7 @@ Development defaults:
 | Mock Client | `http://localhost:8002` |
 | PoP Enforcement | `http://localhost:9100` |
 | Mock MCP (Docker internal) | `http://mock-mcp:9000` |
-| MCP endpoint | `http://localhost:9100/mcp` |
+| MCP endpoint | `http://127.0.0.1:9100/mcp` |
 
 These values are not part of the security model and must remain configurable.
 
