@@ -37,39 +37,40 @@ class ResearchRunner:
         if baseline == "S" and mode != "immutable":
             raise ValueError("S requires immutable-ID execution (X2)")
 
-        # Capture mapping before authorization and before any test hook.
-        snapshot = self.lab.resolve(alias)
+        with self.lab.lock:
+            # Capture mapping before authorization and before any test hook.
+            snapshot = self.lab.resolve(alias)
 
-        if chain is None:
-            reference = (
-                alias
-                if baseline == "B2-weak"
-                else authorized_resource_id
-                if baseline in ("B2-strong", "S")
-                else "*"
+            if chain is None:
+                reference = (
+                    alias
+                    if baseline == "B2-weak"
+                    else authorized_resource_id
+                    if baseline in ("B2-strong", "S")
+                    else "*"
+                )
+                chain = default_chain(reference)
+
+            decision = authorize(
+                lab=self.lab,
+                baseline=baseline,
+                operation=operation,
+                alias=alias,
+                authorized_resource_id=authorized_resource_id,
+                chain=chain,
             )
-            chain = default_chain(reference)
 
-        decision = authorize(
-            lab=self.lab,
-            baseline=baseline,
-            operation=operation,
-            alias=alias,
-            authorized_resource_id=authorized_resource_id,
-            chain=chain,
-        )
-
-        self.authorization_records.append(
-            {
-                "invocation_id": invocation_id,
-                "baseline": baseline,
-                "decision": "PERMIT" if decision.permitted else "DENY",
-                "reason": decision.reason,
-                "authorized_resource_id": authorized_resource_id,
-                "alias_at_authorization": snapshot,
-                "operation": operation,
-            }
-        )
+            self.authorization_records.append(
+                {
+                    "invocation_id": invocation_id,
+                    "baseline": baseline,
+                    "decision": "PERMIT" if decision.permitted else "DENY",
+                    "reason": decision.reason,
+                    "authorized_resource_id": authorized_resource_id,
+                    "alias_at_authorization": snapshot,
+                    "operation": operation,
+                }
+            )
 
         if not decision.permitted:
             return {
