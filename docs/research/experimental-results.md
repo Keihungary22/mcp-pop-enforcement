@@ -84,7 +84,7 @@ Schedule: authorization -> resource check -> pause
 - E4 unauthorized commits: 1.
 - E4 target mismatches: 1.
 - E4 aborted operations: 2.
-- E4 false denials: 0.
+- E4 unchanged-mapping aborts: 0.
 - E4 execution failures in tested cases: 0.
 - E4 legitimate operation success rate: 100% (4/4 controls).
 
