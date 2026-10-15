@@ -1,0 +1,272 @@
+{
+  "experiment": "E4",
+  "rows": [
+    {
+      "mode": "immutable",
+      "scenario": "control",
+      "schedule": [
+        "authorization",
+        "resource_check",
+        "execution",
+        "commit"
+      ],
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "mapping_at_check": "calendar_A",
+      "mapping_at_execution": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "target_mismatch_count": 0,
+      "aborted_operation_count": 0,
+      "unchanged_mapping_abort_count": 0,
+      "legitimate_success": true,
+      "database_commits": [
+        {
+          "invocation_id": "e4-immutable-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e4-immutable-control",
+          "resource_id": "calendar_A",
+          "title": "E4 comparison"
+        }
+      ]
+    },
+    {
+      "mode": "immutable",
+      "scenario": "swap",
+      "schedule": [
+        "authorization",
+        "resource_check",
+        "alias_change",
+        "execution",
+        "commit"
+      ],
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "mapping_at_check": "calendar_A",
+      "mapping_at_execution": "calendar_B",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "target_mismatch_count": 0,
+      "aborted_operation_count": 0,
+      "unchanged_mapping_abort_count": 0,
+      "legitimate_success": false,
+      "database_commits": [
+        {
+          "invocation_id": "e4-immutable-swap",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e4-immutable-swap",
+          "resource_id": "calendar_A",
+          "title": "E4 comparison"
+        }
+      ]
+    },
+    {
+      "mode": "mapping_cas",
+      "scenario": "control",
+      "schedule": [
+        "authorization",
+        "resource_check",
+        "execution",
+        "commit"
+      ],
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "mapping_at_check": "calendar_A",
+      "mapping_at_execution": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "target_mismatch_count": 0,
+      "aborted_operation_count": 0,
+      "unchanged_mapping_abort_count": 0,
+      "legitimate_success": true,
+      "database_commits": [
+        {
+          "invocation_id": "e4-mapping_cas-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e4-mapping_cas-control",
+          "resource_id": "calendar_A",
+          "title": "E4 comparison"
+        }
+      ]
+    },
+    {
+      "mode": "mapping_cas",
+      "scenario": "swap",
+      "schedule": [
+        "authorization",
+        "resource_check",
+        "alias_change",
+        "execution",
+        "abort"
+      ],
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "mapping_at_check": "calendar_A",
+      "mapping_at_execution": "calendar_B",
+      "execution_outcome": "ABORTED",
+      "actual_commit_target": null,
+      "unauthorized_commit_count": 0,
+      "target_mismatch_count": 0,
+      "aborted_operation_count": 1,
+      "unchanged_mapping_abort_count": 0,
+      "legitimate_success": false,
+      "database_commits": [],
+      "database_events": []
+    },
+    {
+      "mode": "checked_transaction",
+      "scenario": "control",
+      "schedule": [
+        "authorization",
+        "resource_check",
+        "execution",
+        "commit"
+      ],
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "mapping_at_check": "calendar_A",
+      "mapping_at_execution": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "target_mismatch_count": 0,
+      "aborted_operation_count": 0,
+      "unchanged_mapping_abort_count": 0,
+      "legitimate_success": true,
+      "database_commits": [
+        {
+          "invocation_id": "e4-checked_transaction-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e4-checked_transaction-control",
+          "resource_id": "calendar_A",
+          "title": "E4 comparison"
+        }
+      ]
+    },
+    {
+      "mode": "checked_transaction",
+      "scenario": "swap",
+      "schedule": [
+        "authorization",
+        "resource_check",
+        "alias_change",
+        "execution",
+        "abort"
+      ],
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "mapping_at_check": "calendar_A",
+      "mapping_at_execution": "calendar_B",
+      "execution_outcome": "ABORTED",
+      "actual_commit_target": null,
+      "unauthorized_commit_count": 0,
+      "target_mismatch_count": 0,
+      "aborted_operation_count": 1,
+      "unchanged_mapping_abort_count": 0,
+      "legitimate_success": false,
+      "database_commits": [],
+      "database_events": []
+    },
+    {
+      "mode": "transaction_only",
+      "scenario": "control",
+      "schedule": [
+        "authorization",
+        "resource_check",
+        "execution",
+        "commit"
+      ],
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "mapping_at_check": "calendar_A",
+      "mapping_at_execution": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_A",
+      "unauthorized_commit_count": 0,
+      "target_mismatch_count": 0,
+      "aborted_operation_count": 0,
+      "unchanged_mapping_abort_count": 0,
+      "legitimate_success": true,
+      "database_commits": [
+        {
+          "invocation_id": "e4-transaction_only-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e4-transaction_only-control",
+          "resource_id": "calendar_A",
+          "title": "E4 comparison"
+        }
+      ]
+    },
+    {
+      "mode": "transaction_only",
+      "scenario": "swap",
+      "schedule": [
+        "authorization",
+        "resource_check",
+        "alias_change",
+        "execution",
+        "commit"
+      ],
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "mapping_at_check": "calendar_A",
+      "mapping_at_execution": "calendar_B",
+      "execution_outcome": "COMMITTED",
+      "actual_commit_target": "calendar_B",
+      "unauthorized_commit_count": 1,
+      "target_mismatch_count": 1,
+      "aborted_operation_count": 0,
+      "unchanged_mapping_abort_count": 0,
+      "legitimate_success": false,
+      "database_commits": [
+        {
+          "invocation_id": "e4-transaction_only-swap",
+          "actual_commit_target": "calendar_B",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e4-transaction_only-swap",
+          "resource_id": "calendar_B",
+          "title": "E4 comparison"
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "unauthorized_commit_count": 1,
+    "target_mismatch_count": 1,
+    "aborted_operation_count": 2,
+    "unchanged_mapping_abort_count": 0,
+    "legitimate_operation_success_rate": 1.0
+  }
+}
