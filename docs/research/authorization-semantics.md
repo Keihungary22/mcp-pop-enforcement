@@ -260,7 +260,9 @@ Minimum fields:
 | `actual_operation` | Operation actually committed, if any |
 | `resource_version` | Relevant version before and/or after execution |
 | `commit_id` | Authoritative commit identifier, if committed |
-| `timestamps` | Authorization, execution, and commit timestamps where available |
+| `authorization_timestamp` | Authorization decision timestamp; null if not observed |
+| `execution_timestamp` | Execution timestamp; null if execution did not occur or was not observed |
+| `commit_timestamp` | Commit timestamp; null if no commit occurred or the timestamp was not observed |
 
 An authorization log is not a substitute for a commit log.
 
