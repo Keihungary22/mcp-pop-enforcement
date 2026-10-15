@@ -1,4 +1,4 @@
-﻿name: mcp-pop-research
+name: mcp-pop-research
 
 services:
   keycloak:
@@ -20,10 +20,9 @@ services:
       context: ..
       dockerfile: research/Dockerfile
     environment:
-      RESEARCH_MCP_HOST: "0.0.0.0"
-      RESEARCH_MCP_PORT: "9000"
-    expose:
-      - "9000"
+      RESEARCH_MCP_SOCKET: "/run/mcp/backend.sock"
+    volumes:
+      - research-mcp-socket:/run/mcp
 
   pop-enforcement:
     build:
@@ -32,7 +31,7 @@ services:
     environment:
       LISTEN_ADDR: ":9200"
       UPSTREAM_MCP_URL: "http://research-mcp:9000/mcp"
-      UPSTREAM_MCP_SOCKET: ""
+      UPSTREAM_MCP_SOCKET: "/run/mcp/backend.sock"
       ACCESS_TOKEN_JWKS_URL: "http://host.docker.internal:8180/realms/mcp-pop/protocol/openid-connect/certs"
       ACCESS_TOKEN_INTROSPECTION_URL: "http://host.docker.internal:8180/realms/mcp-pop/protocol/openid-connect/token/introspect"
       INTROSPECTION_CLIENT_ID: "mcp-resource"
@@ -43,6 +42,15 @@ services:
       EXPECTED_DPOP_HTU: "http://127.0.0.1:9200/mcp"
     ports:
       - "9200:9200"
+    volumes:
+      - research-mcp-socket:/run/mcp
+    group_add:
+      - "101"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - keycloak
       - research-mcp
+
+volumes:
+  research-mcp-socket:
