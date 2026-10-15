@@ -17,7 +17,7 @@ def test_e4_deterministic_schedule(mode, swap):
         assert row["execution_outcome"] == "COMMITTED"
         assert row["actual_commit_target"] == "calendar_A"
         assert row["legitimate_success"]
-        assert row["false_denial_count"] == 0
+        assert row["unchanged_mapping_abort_count"] == 0
     elif mode == "transaction_only":
         assert row["execution_outcome"] == "COMMITTED"
         assert row["actual_commit_target"] == "calendar_B"
@@ -43,5 +43,5 @@ def test_e4_suite_metrics_and_repeatability():
     assert a["metrics"]["unauthorized_commit_count"] == 1
     assert a["metrics"]["target_mismatch_count"] == 1
     assert a["metrics"]["aborted_operation_count"] == 2
-    assert a["metrics"]["false_denial_count"] == 0
+    assert a["metrics"]["unchanged_mapping_abort_count"] == 0
     assert a["metrics"]["legitimate_operation_success_rate"] == 1.0

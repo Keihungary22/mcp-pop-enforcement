@@ -43,6 +43,7 @@ def run_e4(mode: str, *, swap: bool) -> dict:
             order.append("execution")
 
             with lab.lock, lab.db:
+                lab.db.execute("BEGIN IMMEDIATE")
                 current = lab.resolve("work")
 
                 if mode == "immutable":
@@ -138,7 +139,7 @@ def run_e4(mode: str, *, swap: bool) -> dict:
         "unauthorized_commit_count": int(target is not None and target != authorized_id),
         "target_mismatch_count": int(target is not None and target != authorized_id),
         "aborted_operation_count": int(target is None),
-        "false_denial_count": int(not swap and target is None),
+        "unchanged_mapping_abort_count": int(not swap and target is None),
         "legitimate_success": not swap and target == authorized_id,
         "database_commits": commits,
         "database_events": events,
@@ -156,7 +157,7 @@ def run_suite() -> dict:
             "unauthorized_commit_count": sum(r["unauthorized_commit_count"] for r in rows),
             "target_mismatch_count": sum(r["target_mismatch_count"] for r in rows),
             "aborted_operation_count": sum(r["aborted_operation_count"] for r in rows),
-            "false_denial_count": sum(r["false_denial_count"] for r in rows),
+            "unchanged_mapping_abort_count": sum(r["unchanged_mapping_abort_count"] for r in rows),
             "legitimate_operation_success_rate": (
                 sum(r["legitimate_success"] for r in controls) / len(controls)
             ),
