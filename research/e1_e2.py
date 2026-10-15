@@ -135,6 +135,79 @@ def run_suite():
 
 
 def write_results(data):
+    # Validate conclusions before creating or overwriting result files.
+    rows = data["experiments"]
+    metrics = data["metrics"]
+
+    expected = {
+        (baseline, "X1" if mode == "alias" else "X2"): (
+            "calendar_B" if mode == "alias" else "calendar_A",
+            int(mode == "alias"),
+        )
+        for _, baseline, mode in CASES
+    }
+
+    swaps = [
+        row for row in rows
+        if row["experiment"] == "E2" and row["scenario"] == "alias_swap"
+    ]
+
+    seen = set()
+    for row in swaps:
+        key = (row["baseline"], row["execution_mode"])
+        if key not in expected or key in seen:
+            raise ValueError(f"Unexpected or duplicate E2 swap case: {key}")
+        seen.add(key)
+
+        target, unauthorized = expected[key]
+        if (
+            row["authorization_decision"] != "PERMIT"
+            or row["execution_outcome"] != "COMMITTED"
+            or row["actual_commit_target"] != target
+            or row["unauthorized_commit_count"] != unauthorized
+            or len(row["database_commits"]) != 1
+            or len(row["database_events"]) != 1
+            or row["database_commits"][0]["actual_commit_target"] != target
+            or row["database_events"][0]["resource_id"] != target
+        ):
+            raise ValueError(f"E2 swap observation contradicts findings: {key}")
+
+    if seen != set(expected):
+        raise ValueError("Incomplete E2 swap matrix")
+
+    controls = [
+        row for row in rows
+        if row["experiment"] == "E2"
+        and row["scenario"] == "legitimate_control"
+    ]
+
+    if (
+        len(controls) != 4
+        or any(
+            not row["legitimate_success"]
+            or row["authorization_decision"] != "PERMIT"
+            or row["execution_outcome"] != "COMMITTED"
+            or row["actual_commit_target"] != "calendar_A"
+            for row in controls
+        )
+        or metrics["legitimate_attempts"] != 4
+        or metrics["legitimate_successes"] != 4
+        or metrics["legitimate_operation_success_rate"] != 1.0
+    ):
+        raise ValueError("Legitimate-control observations contradict findings")
+
+    if (
+        metrics["e1_unauthorized_commit_count"] != sum(
+            row["unauthorized_commit_count"]
+            for row in rows if row["experiment"] == "E1"
+        )
+        or metrics["e2_unauthorized_commit_count"] != sum(
+            row["unauthorized_commit_count"]
+            for row in swaps
+        )
+    ):
+        raise ValueError("Reported unauthorized-commit metrics do not match rows")
+
     directory = Path("research/results")
     directory.mkdir(parents=True, exist_ok=True)
 

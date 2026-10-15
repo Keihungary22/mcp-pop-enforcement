@@ -2,7 +2,7 @@
 
 import pytest
 
-from research.e1_e2 import CASES, run_case, run_suite
+from research.e1_e2 import CASES, run_case, run_suite, write_results
 
 
 def test_e1_alias_swap_records_actual_commit():
@@ -29,10 +29,16 @@ def test_e2_authorization_execution_matrix(case, baseline, mode, swap):
     assert len(row["database_commits"]) == 1
     assert len(row["database_events"]) == 1
 
+    expected_target = "calendar_B" if swap and mode == "alias" else "calendar_A"
+    expected_unauthorized = int(swap and mode == "alias")
+
+    assert row["actual_commit_target"] == expected_target
+    assert row["unauthorized_commit_count"] == expected_unauthorized
+    assert row["database_commits"][0]["actual_commit_target"] == expected_target
+    assert row["database_events"][0]["resource_id"] == expected_target
+
     if not swap:
-        assert row["actual_commit_target"] == "calendar_A"
         assert row["legitimate_success"] is True
-        assert row["unauthorized_commit_count"] == 0
 
 
 def test_suite_is_deterministic():
@@ -46,3 +52,31 @@ def test_suite_is_deterministic():
     assert first["metrics"]["e2_unauthorized_commit_count"] == 2
     assert first["metrics"]["legitimate_successes"] == 4
     assert first["metrics"]["legitimate_operation_success_rate"] == 1.0
+
+
+def test_report_rejects_inconsistent_swap_results(tmp_path, monkeypatch):
+    data = run_suite()
+    row = next(
+        row for row in data["experiments"]
+        if row["experiment"] == "E2"
+        and row["case"] == "B"
+        and row["scenario"] == "alias_swap"
+    )
+    row["actual_commit_target"] = "calendar_A"
+
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(ValueError, match="E2 swap observation"):
+        write_results(data)
+
+    assert not (tmp_path / "research/results/e1_e2.json").exists()
+
+
+def test_report_rejects_incorrect_success_metrics(tmp_path, monkeypatch):
+    data = run_suite()
+    data["metrics"]["legitimate_successes"] = 3
+
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(ValueError, match="Legitimate-control"):
+        write_results(data)
+
+    assert not (tmp_path / "research/results/e1_e2_findings.md").exists()
