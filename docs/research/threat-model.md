@@ -290,6 +290,7 @@ Required values:
 invocation_id
 scenario
 baseline
+requested_alias
 authorization_decision: PERMIT | DENY
 execution_outcome: COMMITTED | ABORTED | FAILED | TIMEOUT
 expected_target
