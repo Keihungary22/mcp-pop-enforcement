@@ -1,0 +1,119 @@
+{
+  "experiment": "E3",
+  "model": "isolated_in_memory_sqlite",
+  "rows": [
+    {
+      "experiment": "E3a",
+      "scenario": "control",
+      "baseline": "B2-strong",
+      "execution_mode": "X1",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_A",
+      "actual_commit_target": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "unauthorized_commit_count": 0,
+      "database_commits": [
+        {
+          "invocation_id": "e3-alias-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e3-alias-control",
+          "resource_id": "calendar_A",
+          "title": "Research event"
+        }
+      ]
+    },
+    {
+      "experiment": "E3a",
+      "scenario": "swap",
+      "baseline": "B2-strong",
+      "execution_mode": "X1",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_B",
+      "actual_commit_target": "calendar_B",
+      "execution_outcome": "COMMITTED",
+      "unauthorized_commit_count": 1,
+      "database_commits": [
+        {
+          "invocation_id": "e3-alias-swap",
+          "actual_commit_target": "calendar_B",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e3-alias-swap",
+          "resource_id": "calendar_B",
+          "title": "Research event"
+        }
+      ]
+    },
+    {
+      "experiment": "E3b",
+      "scenario": "control",
+      "baseline": "B2-strong",
+      "execution_mode": "X2",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_A",
+      "actual_commit_target": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "unauthorized_commit_count": 0,
+      "database_commits": [
+        {
+          "invocation_id": "e3-immutable-control",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e3-immutable-control",
+          "resource_id": "calendar_A",
+          "title": "Research event"
+        }
+      ]
+    },
+    {
+      "experiment": "E3b",
+      "scenario": "swap",
+      "baseline": "B2-strong",
+      "execution_mode": "X2",
+      "authorization_decision": "PERMIT",
+      "authorized_resource_id": "calendar_A",
+      "alias_at_authorization": "calendar_A",
+      "alias_at_execution": "calendar_B",
+      "actual_commit_target": "calendar_A",
+      "execution_outcome": "COMMITTED",
+      "unauthorized_commit_count": 0,
+      "database_commits": [
+        {
+          "invocation_id": "e3-immutable-swap",
+          "actual_commit_target": "calendar_A",
+          "operation": "create_calendar_event"
+        }
+      ],
+      "database_events": [
+        {
+          "invocation_id": "e3-immutable-swap",
+          "resource_id": "calendar_A",
+          "title": "Research event"
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "unauthorized_commit_count": 1,
+    "legitimate_successes": 2,
+    "legitimate_attempts": 2
+  }
+}
