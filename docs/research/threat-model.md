@@ -292,9 +292,11 @@ scenario
 baseline
 authorization_decision: PERMIT | DENY
 execution_outcome: COMMITTED | ABORTED | FAILED | TIMEOUT
+expected_target
 authorized_resource_id
 actual_commit_target
 requested_operation
+authorized_operation
 actual_operation
 resource_version
 commit_id
@@ -302,6 +304,9 @@ authorization_timestamp
 execution_timestamp
 commit_timestamp
 ```
+
+For B0/B1 without an invocation-level resource constraint, `authorized_resource_id` is null. `expected_target` records external intent separately and must not be treated as an enforced authorization constraint.
+
 
 Only an actual committed modification counts as a commit.
 
