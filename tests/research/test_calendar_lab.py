@@ -179,3 +179,24 @@ def test_calendar_tool_over_mcp_protocol() -> None:
             assert mcp_lab.commits()[0]["actual_commit_target"] == "calendar_A"
 
     asyncio.run(run())
+
+
+def test_invalid_execution_mode_is_recorded() -> None:
+    lab = CalendarLab()
+
+    with pytest.raises(ValueError, match="Unknown execution mode"):
+        lab.execute(
+            **make_args(lab, "invalid-mode"),
+            mode="unsupported",
+        )
+
+    assert lab.commits() == []
+    assert lab.events() == []
+    assert lab.version("calendar_A") == 0
+
+    logs = lab.executions()
+    assert len(logs) == 1
+    assert logs[0]["invocation_id"] == "invalid-mode"
+    assert logs[0]["execution_outcome"] == "FAILED"
+    assert logs[0]["error_type"] == "ValueError"
+    assert logs[0]["actual_commit_target"] is None

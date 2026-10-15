@@ -175,11 +175,11 @@ class CalendarLab:
         The caller must capture alias_at_authorization at authorization time.
         This method never reconstructs that historical value from live state.
         """
-        if mode not in ("alias", "immutable"):
-            raise ValueError(f"Unknown execution mode: {mode}")
-
         execution_mapping = None
         try:
+            if mode not in ("alias", "immutable"):
+                raise ValueError(f"Unknown execution mode: {mode}")
+
             if after_authorization is not None:
                 after_authorization()
 
