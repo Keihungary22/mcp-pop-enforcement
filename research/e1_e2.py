@@ -147,10 +147,7 @@ def write_results(data):
         for _, baseline, mode in CASES
     }
 
-    swaps = [
-        row for row in rows
-        if row["experiment"] == "E2" and row["scenario"] == "alias_swap"
-    ]
+    swaps = [row for row in rows if row["experiment"] == "E2" and row["scenario"] == "alias_swap"]
 
     seen = set()
     for row in swaps:
@@ -176,9 +173,7 @@ def write_results(data):
         raise ValueError("Incomplete E2 swap matrix")
 
     controls = [
-        row for row in rows
-        if row["experiment"] == "E2"
-        and row["scenario"] == "legitimate_control"
+        row for row in rows if row["experiment"] == "E2" and row["scenario"] == "legitimate_control"
     ]
 
     if (
@@ -188,6 +183,11 @@ def write_results(data):
             or row["authorization_decision"] != "PERMIT"
             or row["execution_outcome"] != "COMMITTED"
             or row["actual_commit_target"] != "calendar_A"
+            or row["unauthorized_commit_count"] != 0
+            or len(row["database_commits"]) != 1
+            or len(row["database_events"]) != 1
+            or row["database_commits"][0]["actual_commit_target"] != "calendar_A"
+            or row["database_events"][0]["resource_id"] != "calendar_A"
             for row in controls
         )
         or metrics["legitimate_attempts"] != 4
@@ -196,15 +196,10 @@ def write_results(data):
     ):
         raise ValueError("Legitimate-control observations contradict findings")
 
-    if (
-        metrics["e1_unauthorized_commit_count"] != sum(
-            row["unauthorized_commit_count"]
-            for row in rows if row["experiment"] == "E1"
-        )
-        or metrics["e2_unauthorized_commit_count"] != sum(
-            row["unauthorized_commit_count"]
-            for row in swaps
-        )
+    if metrics["e1_unauthorized_commit_count"] != sum(
+        row["unauthorized_commit_count"] for row in rows if row["experiment"] == "E1"
+    ) or metrics["e2_unauthorized_commit_count"] != sum(
+        row["unauthorized_commit_count"] for row in rows if row["experiment"] == "E2"
     ):
         raise ValueError("Reported unauthorized-commit metrics do not match rows")
 

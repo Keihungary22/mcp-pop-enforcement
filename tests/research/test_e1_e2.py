@@ -57,10 +57,9 @@ def test_suite_is_deterministic():
 def test_report_rejects_inconsistent_swap_results(tmp_path, monkeypatch):
     data = run_suite()
     row = next(
-        row for row in data["experiments"]
-        if row["experiment"] == "E2"
-        and row["case"] == "B"
-        and row["scenario"] == "alias_swap"
+        row
+        for row in data["experiments"]
+        if row["experiment"] == "E2" and row["case"] == "B" and row["scenario"] == "alias_swap"
     )
     row["actual_commit_target"] = "calendar_A"
 
@@ -80,3 +79,35 @@ def test_report_rejects_incorrect_success_metrics(tmp_path, monkeypatch):
         write_results(data)
 
     assert not (tmp_path / "research/results/e1_e2_findings.md").exists()
+
+
+def test_report_rejects_corrupted_control_sqlite_event(tmp_path, monkeypatch):
+    data = run_suite()
+    row = next(
+        row
+        for row in data["experiments"]
+        if row["experiment"] == "E2" and row["scenario"] == "legitimate_control"
+    )
+    row["database_events"][0]["resource_id"] = "calendar_B"
+
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(ValueError, match="Legitimate-control"):
+        write_results(data)
+
+    assert not (tmp_path / "research/results/e1_e2.json").exists()
+
+
+def test_report_rejects_control_unauthorized_count(tmp_path, monkeypatch):
+    data = run_suite()
+    row = next(
+        row
+        for row in data["experiments"]
+        if row["experiment"] == "E2" and row["scenario"] == "legitimate_control"
+    )
+    row["unauthorized_commit_count"] = 1
+
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(ValueError, match="Legitimate-control|unauthorized-commit metrics"):
+        write_results(data)
+
+    assert not (tmp_path / "research/results/e1_e2.json").exists()
