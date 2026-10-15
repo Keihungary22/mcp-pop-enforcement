@@ -70,7 +70,7 @@ different correctness guarantees.
 Schedule: authorization -> resource check -> pause
 -> optional alias change -> execution -> commit or abort.
 
-| Control | Scenario | Authorization | Outcome | Commit target | Unauthorized | Abort | False denial |
+| Control | Scenario | Authorization | Outcome | Commit target | Unauthorized | Abort | Unchanged-mapping abort |
 | --- | --- | --- | --- | --- | ---: | ---: | ---: |
 | immutable | control | PERMIT | COMMITTED | calendar_A | 0 | 0 | 0 |
 | immutable | swap | PERMIT | COMMITTED | calendar_A | 0 | 0 | 0 |

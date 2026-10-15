@@ -66,11 +66,12 @@ Four existing enforcement approaches were compared:
 Recorded unauthorized commits: 1.
 Recorded target mismatches: 1.
 Recorded aborts: 2.
-Originally classified false denials: 0.
+Recorded unchanged-mapping aborts: 0.
 Legitimate no-change operations: 4/4 successful.
 
-The original false-denial count is retained as an experimental
-record and must not be reused as a policy-independent comparison.
+The unchanged-mapping abort count measures aborts in scenarios
+without an alias change. It is not a policy-independent
+false-denial metric.
 
 All four experimental stages were completed. No E1-E4 experiment
 is classified as skipped.
