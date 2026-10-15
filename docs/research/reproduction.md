@@ -19,13 +19,12 @@ Regenerate E4 results:
 
     python -m research.e4
 
-Run the four E3 schedules:
+Regenerate E3 results, including the complete suite and aggregate metrics:
 
-    python -c 'from research.e3 import run_e3; [print(run_e3(m, swap=s)) for m in ("alias", "immutable") for s in (False, True)]'
+    python -m research.e3
 
-The E3 command prints results but does not regenerate e3.json.
-The saved E3 artifact was produced by running the four schedules
-and recording their outputs.
+The command deterministically generates research/results/e3.json
+using the four E3 schedules.
 
 ## Verification
 

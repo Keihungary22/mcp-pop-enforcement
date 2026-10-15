@@ -111,12 +111,12 @@ Relationship to E1-E4:
 The observed failure of a deliberately re-resolving execution
 mode is not evidence of a flaw in this proposal.
 
-## 5. PAuth — Precise Task-Scoped Authorization for Agents
+## 5. PAuth — Precise Task-Scoped Implicit Authorization
 
 Source:
 https://arxiv.org/abs/2603.17170
 
-Sharma, Jiang, Lin, and Chen, 2026.
+Sharma, Jiang, Chen, and Lin, 2026.
 
 PAuth investigates precise task-scoped authorization for
 agent actions. It introduces symbolic specifications of expected
@@ -234,5 +234,5 @@ is insufficient evidence of research novelty.
    Delegation Chains, Internet-Draft -01, 2026.
 4. Asor, Verifiable Attenuated Delegation for AI Agent Chains,
    Internet-Draft -01, 2026.
-5. Sharma et al., PAuth: Precise Task-Scoped Authorization
-   for Agents, 2026.
+5. Sharma, Jiang, Chen, and Lin, Beyond OAuth: Task-Scoped
+   Authorization for AI Agents via Natural Language Slices, 2026.
