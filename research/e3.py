@@ -1,6 +1,8 @@
 """Deterministic check-then-commit TOCTOU experiments."""
 
+import json
 import threading
+from pathlib import Path
 
 from research.calendar_lab.lab import CalendarLab, PausePoint
 from research.runner import ResearchRunner
@@ -80,3 +82,42 @@ def run_e3(mode: str, *, swap: bool) -> dict:
         "database_commits": commits,
         "database_events": events,
     }
+
+
+def run_suite() -> dict:
+    rows = [
+        run_e3(mode, swap=swap)
+        for mode in ("alias", "immutable")
+        for swap in (False, True)
+    ]
+    controls = [row for row in rows if row["scenario"] == "control"]
+
+    return {
+        "experiment": "E3",
+        "model": "isolated_in_memory_sqlite",
+        "rows": rows,
+        "metrics": {
+            "unauthorized_commit_count": sum(
+                row["unauthorized_commit_count"] for row in rows
+            ),
+            "legitimate_successes": sum(
+                row["authorization_decision"] == "PERMIT"
+                and row["execution_outcome"] == "COMMITTED"
+                and row["actual_commit_target"] == "calendar_A"
+                for row in controls
+            ),
+            "legitimate_attempts": len(controls),
+        },
+    }
+
+
+def write_results(data: dict, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(data, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+if __name__ == "__main__":
+    write_results(run_suite(), Path("research/results/e3.json"))

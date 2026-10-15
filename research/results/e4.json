@@ -19,7 +19,7 @@
       "unauthorized_commit_count": 0,
       "target_mismatch_count": 0,
       "aborted_operation_count": 0,
-      "false_denial_count": 0,
+      "unchanged_mapping_abort_count": 0,
       "legitimate_success": true,
       "database_commits": [
         {
@@ -55,7 +55,7 @@
       "unauthorized_commit_count": 0,
       "target_mismatch_count": 0,
       "aborted_operation_count": 0,
-      "false_denial_count": 0,
+      "unchanged_mapping_abort_count": 0,
       "legitimate_success": false,
       "database_commits": [
         {
@@ -90,7 +90,7 @@
       "unauthorized_commit_count": 0,
       "target_mismatch_count": 0,
       "aborted_operation_count": 0,
-      "false_denial_count": 0,
+      "unchanged_mapping_abort_count": 0,
       "legitimate_success": true,
       "database_commits": [
         {
@@ -126,7 +126,7 @@
       "unauthorized_commit_count": 0,
       "target_mismatch_count": 0,
       "aborted_operation_count": 1,
-      "false_denial_count": 0,
+      "unchanged_mapping_abort_count": 0,
       "legitimate_success": false,
       "database_commits": [],
       "database_events": []
@@ -149,7 +149,7 @@
       "unauthorized_commit_count": 0,
       "target_mismatch_count": 0,
       "aborted_operation_count": 0,
-      "false_denial_count": 0,
+      "unchanged_mapping_abort_count": 0,
       "legitimate_success": true,
       "database_commits": [
         {
@@ -185,7 +185,7 @@
       "unauthorized_commit_count": 0,
       "target_mismatch_count": 0,
       "aborted_operation_count": 1,
-      "false_denial_count": 0,
+      "unchanged_mapping_abort_count": 0,
       "legitimate_success": false,
       "database_commits": [],
       "database_events": []
@@ -208,7 +208,7 @@
       "unauthorized_commit_count": 0,
       "target_mismatch_count": 0,
       "aborted_operation_count": 0,
-      "false_denial_count": 0,
+      "unchanged_mapping_abort_count": 0,
       "legitimate_success": true,
       "database_commits": [
         {
@@ -244,7 +244,7 @@
       "unauthorized_commit_count": 1,
       "target_mismatch_count": 1,
       "aborted_operation_count": 0,
-      "false_denial_count": 0,
+      "unchanged_mapping_abort_count": 0,
       "legitimate_success": false,
       "database_commits": [
         {
@@ -266,7 +266,7 @@
     "unauthorized_commit_count": 1,
     "target_mismatch_count": 1,
     "aborted_operation_count": 2,
-    "false_denial_count": 0,
+    "unchanged_mapping_abort_count": 0,
     "legitimate_operation_success_rate": 1.0
   }
 }

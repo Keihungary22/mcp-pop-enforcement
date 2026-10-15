@@ -46,7 +46,7 @@ immutable ID and commits to calendar_A under the same schedule.
 - E4 Unauthorized Commit Count: 1.
 - E4 Target Mismatch Count: 1.
 - E4 Aborted Operation Count: 2.
-- E4 False Denial Count: 0.
+- E4 Unchanged-Mapping Abort Count: 0.
 - E4 Legitimate Operation Success Rate: 100% (4 tested controls).
 
 E3 and E4 include overlapping configurations. Their counts are
@@ -58,8 +58,10 @@ separate observations, not independent vulnerability discoveries.
 - Mapping CAS uses a conditional SQL insert and aborts if the current
   alias mapping differs. It does not use a version counter and does
   not protect against an A -> B -> A ABA history.
-- Checked Transaction checks the mapping and writes inside the same
-  SQLite lock and transaction. It aborts on a detected mismatch.
+- Checked Transaction starts `BEGIN IMMEDIATE` before reading the
+  mapping and performs the checked write within that transaction.
+  The in-memory experiment also uses an in-process RLock.
+  It aborts when the current mapping differs from the authorized ID.
 - Transaction Only performs an atomic write but does not enforce the
   authorized target; it commits to calendar_B in the swapped case.
 
@@ -97,7 +99,9 @@ atomicity requirement needed to preserve it.
 
 - The delegation fixture is unsigned and simulated.
 - The experiments invoke the research model, not the live Gateway.
-- SQLite is in-memory and shared through an in-process RLock.
+- E4 uses in-memory SQLite with one shared connection and an in-process RLock.
+- A separate file-backed SQLite test verifies `BEGIN IMMEDIATE` locking
+  across independent connections; E4 itself is not a multi-connection test.
 - The schedules are controlled and do not cover arbitrary races.
 - CAS is value-based, not version-based.
 - No distributed transaction or production lock guarantee is tested.
