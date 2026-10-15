@@ -205,7 +205,7 @@ Use this comparison to isolate the significance of resource re-resolution.
 
 ### E4 — Atomic Execution
 
-The completed E4 implementation compares four specific controls:
+The E4 design specifies four comparison controls. Implementation and result artifacts are provided separately in the subsequent experimental PR #42, not in this documentation-only PR:
 
 **1. Immutable-ID execution**
 
@@ -229,7 +229,7 @@ The execution path uses a SQLite transaction but selects the write target by res
 
 **Comparison boundaries**
 
-All four controls are tested with unchanged and changed mappings. Authorization occurs before the controlled synchronization point. The mapping update is inserted before execution proceeds. Actual event rows and commit records are inspected independently of the returned status.
+The experimental protocol compares all four controls with unchanged and changed mappings. Authorization occurs before the controlled synchronization point. The mapping update is inserted before execution proceeds. The evaluation must inspect actual event rows and commit records independently of the returned status.
 
 The experiment does not separately evaluate a version-based CAS implementation, a distributed lock, or a multi-process transaction protocol.
 
@@ -319,3 +319,7 @@ Resource IDs and operation permissions must be checked independently.
 - Findings must be evaluated against properly implemented existing mitigation mechanisms.
 - The novelty of the research is not established in advance.
 - The exact attacker capabilities and synchronization points must be reported for each experiment.
+
+
+Implementation status for this documentation revision:
+E4 behavior and measurements require the separate experiment implementation and artifacts. The controls described above must not be treated as experimentally verified by this PR alone.

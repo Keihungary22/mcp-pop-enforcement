@@ -203,6 +203,15 @@ Number of committed invocations for which:
 ActualTarget(i) != AuthorizedTarget(i)
 ```
 
+This metric applies only when the baseline enforces an
+invocation-level authorized target. When no such target exists
+(as in B0/B1), the metric is N/A, not zero, and the invocation
+is excluded from its applicable denominator.
+
+A committed target differing from `expected_target` is an
+external-intent mismatch, recorded separately. It is not
+automatically an authorization violation under B0/B1.
+
 Abort and timeout outcomes must be reported separately rather than silently treated as safe successful operations.
 
 ### 8.2 Functionality Metrics
@@ -241,7 +250,8 @@ Minimum fields:
 | `scenario` | E1, E2, E3a, E3b, or E4 |
 | `baseline` | B0, B1, B2-weak, B2-strong, or S |
 | `requested_alias` | Mutable alias used in the request, if applicable |
-| `authorized_resource_id` | Immutable ID fixed at authorization time |
+| `expected_target` | Resource intended by the external test scenario; not necessarily authorized by the baseline |
+| `authorized_resource_id` | Invocation-level target constrained by the baseline; null when none exists, including B0/B1 |
 | `requested_operation` | Tool operation submitted by the delegatee |
 | `authorized_operation` | Operation allowed by the authorization policy |
 | `authorization_decision` | PERMIT or DENY |
