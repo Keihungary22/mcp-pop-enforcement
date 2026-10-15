@@ -150,7 +150,7 @@ The research distinguishes:
 
 - A check-then-use flow that re-resolves a mutable alias.
 - A flow that directly uses the immutable Resource ID.
-- A conditional write tied to an appropriate resource version.
+- A conditional write checking the current alias mapping value.
 - Atomic execution using transactions or locks.
 
 These alternatives must not be assumed equivalent without evaluating their actual behavior and concurrency guarantees.
@@ -205,17 +205,37 @@ Use this comparison to isolate the significance of resource re-resolution.
 
 ### E4 — Atomic Execution
 
-Separately evaluate:
+The completed E4 implementation compares four specific controls:
 
-- Direct immutable-ID execution.
-- Version-based conditional update.
-- Compare-and-swap.
-- Database transactions.
-- Lock-based execution.
+**1. Immutable-ID execution**
 
-For each approach, measure unauthorized commits, aborts, legitimate operation success, authorization latency, end-to-end latency, and concurrent behavior.
+The authorization-time target is calendar_A. The execution path inserts the event directly for calendar_A, without consulting the mutable alias for final target selection. An intervening alias change does not redirect the write.
 
-The presence of a transaction or lock alone is not sufficient evidence of correctness: the protected resource and the scope of atomicity must be specified.
+**2. Mapping CAS (value-based conditional write)**
+
+The SQLite INSERT is conditional on the alias row still mapping `work` to calendar_A at mutation time. If the conditional INSERT affects no row, execution aborts without committing the event.
+
+This is a comparison against the current mapping value, not a version-based CAS. It does not establish protection against an A-to-B-to-A history.
+
+**3. Checked transaction**
+
+The execution path acquires the research lab's shared application lock, checks the current alias mapping against calendar_A, and performs the permitted write within the guarded SQLite transaction. A mismatched mapping results in an abort.
+
+The mapping mutation in this fixture uses the same application lock. The observed guarantee relies on that shared synchronization discipline and a single process-local SQLite connection. It must not be generalized to independent processes or databases without further validation.
+
+**4. Transaction only**
+
+The execution path uses a SQLite transaction but selects the write target by resolving the alias at execution time. Because the transaction does not enforce the previously authorized target, an alias swap can cause a committed write to calendar_B.
+
+**Comparison boundaries**
+
+All four controls are tested with unchanged and changed mappings. Authorization occurs before the controlled synchronization point. The mapping update is inserted before execution proceeds. Actual event rows and commit records are inspected independently of the returned status.
+
+The experiment does not separately evaluate a version-based CAS implementation, a distributed lock, or a multi-process transaction protocol.
+
+Authorization latency, end-to-end latency, p95, throughput, and mitigation overhead were not meaningfully benchmarked. Artificial barrier waits are not performance measurements.
+
+The existence of a transaction or lock alone does not imply authorization correctness; the checked predicate and synchronization scope determine the guarantee.
 
 ## 9. Baseline Interpretation
 
@@ -223,7 +243,13 @@ The presence of a transaction or lock alone is not sufficient evidence of correc
 - **B1:** Adds human-rooted delegation-chain validation.
 - **B2-weak:** Constrains mutable aliases; used as a negative control.
 - **B2-strong:** Uses correctly enforced invocation constraints, including immutable IDs when appropriate.
-- **S:** Applies suitable existing execution-level consistency mechanisms.
+- **S:** Represents explicitly specified existing execution controls, not a separate authorization-layer baseline.
+
+B0/B1 lack invocation-level fixed-target enforcement in the tested baseline descriptions. External resource intent must not be misreported as an authorization guarantee supplied by those baselines.
+
+Execution mechanisms X1 and X2 are independent of the authorization-baseline labels.
+
+E1-E4 did not independently test operation-authorization violations. Their security observations primarily concern execution-target consistency.
 
 A new proposed method is outside the initial implementation scope.
 

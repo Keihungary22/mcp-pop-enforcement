@@ -137,7 +137,11 @@ Committed(i) => OperationAllowed(i, ActualOperation(i), ActualTarget(i))
 
 For example, permission to read `calendar_A` does not authorize writing to `calendar_A`.
 
-The target-consistency property and operation-authorization property are evaluated separately.
+Target consistency and operation authorization are distinct properties.
+
+E1-E4 vary resource mappings and execution mechanisms but do not independently inject unauthorized operations, such as a read-to-write escalation.
+
+Therefore, the completed E1-E4 experiments provide evidence for target consistency only. They do not establish empirical validation of operation consistency. Operation-violation counts must not be presented as experimentally validated when the necessary test cases were not conducted.
 
 ### 6.3 Delegation and Access Preconditions
 
@@ -171,7 +175,17 @@ For ambiguous failures or timeouts, consult authoritative commit records before 
 
 **Unauthorized Commit Count (UCC)**
 
-Number of invocations with a committed write that violates the fixed-target or operation-authorization constraints. Target violations and operation violations are also reported separately.
+Number of invocations with an actual committed write that violates at least one applicable authorization condition:
+
+- The authorization decision was `DENY`.
+- The committed target violates an applicable fixed-target constraint.
+- The committed operation violates an applicable operation constraint.
+
+These categories must be reported separately. An invocation violating multiple conditions contributes only once to UCC.
+
+For B0/B1, a fixed-target violation must not be inferred from an external intent oracle when the baseline does not enforce invocation-level target authorization. Missing fine-grained enforcement is reported separately from violations of constraints the baseline actually enforces.
+
+Historical E1-E4 JSON metrics retain their original definitions. Any revised UCC calculation requires explicit reclassification from underlying evidence; the stored counts are not silently reinterpreted.
 
 **Unauthorized Commit Rate (UCR)**
 
@@ -244,6 +258,24 @@ Commit records must be correlated with the actual backend state to identify comm
 
 ## 10. Experimental Baselines
 
+### 10.1 Applicability of target constraints
+
+B0 validates OAuth and DPoP according to its configured policy.
+B1 additionally models delegation validity.
+
+Neither baseline necessarily authorizes a specific immutable calendar resource. When its scope permits both calendar_A and calendar_B, a B0/B1 write to calendar_B is not automatically a violation of that baseline merely because an external test oracle expected calendar_A.
+
+The evaluation must distinguish:
+
+- `expected_target`: the resource intended by the external test scenario.
+- `authorized_resource_id`: an invocation-level target actually authorized and enforced by the selected baseline, if any.
+- `actual_commit_target`: the resource modified by the committed side effect.
+
+B0/B1 are applicability controls for the absence of finer-grained guarantees. A target mismatch against an external intent oracle must be labelled accordingly, rather than counted as a violation of an invocation-level constraint that B0/B1 never enforced.
+
+### 10.2 Authorization and execution dimensions
+
+
 | Baseline | Definition | Research purpose |
 | --- | --- | --- |
 | B0 | OAuth + DPoP | Establish whether token and proof validation alone preserve execution consistency |
@@ -254,13 +286,34 @@ Commit records must be correlated with the actual backend state to identify comm
 
 B2-weak is a negative control, not the principal competing state-of-the-art solution.
 
+The B0/B1/B2 labels describe authorization-layer capabilities, not a complete executable configuration.
+
+Execution mechanisms must be specified independently:
+
+- `X1`: the execution adapter re-resolves the mutable alias before the write.
+- `X2`: the execution adapter uses the immutable resource ID retained from authorization.
+
+A comparable test case is defined by the combination of authorization baseline, execution mechanism, authorization policy, initial state, mutation schedule, and commit observation.
+
+E2 explicitly compares B2-weak and B2-strong crossed with X1 and X2, under both unchanged and swapped mappings.
+
+`S` is not an additional authorization baseline interchangeable with B0-B2. It represents a selected existing execution-consistency control whose actual operation and enforcement boundary must be specified.
+
+Any B0/B1 comparison must hold the execution mechanism constant and evaluate only guarantees applicable to that baseline. Do not attribute an execution-mode effect to OAuth or delegation validation.
+
 No complete AAT specification compliance is claimed without separate conformance assessment.
 
 A proposed method (P) is considered only if meaningful limitations of strong existing solutions are demonstrated.
 
 ## 11. Experimental Consistency Requirements
 
-E1-E4 must use the same fixed-target authorization semantics.
+E1-E4 use fixed-target semantics for the research scenarios that enforce an invocation-level resource target.
+
+This fixed target is an explicit experimental policy or oracle; it is not automatically a constraint enforced by B0/B1.
+
+The completed E1-E4 tests exercise target consistency. Operation consistency remains a specified but untested property.
+
+A denial followed by a committed side effect is unauthorized independently of whether the committed target matches an intended target.
 
 - **E1:** Evaluate alias replacement after authorization.
 - **E2:** Evaluate binding to immutable Resource IDs under the same alias change.
