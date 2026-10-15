@@ -35,9 +35,7 @@ def test_e3_saved_results_are_reproducible(tmp_path):
     assert first["metrics"]["legitimate_successes"] == 2
     assert first["metrics"]["legitimate_attempts"] == 2
 
-    saved = json.loads(
-        Path("research/results/e3.json").read_text(encoding="utf-8")
-    )
+    saved = json.loads(Path("research/results/e3.json").read_text(encoding="utf-8"))
     assert saved == first
 
     output = tmp_path / "e3.json"

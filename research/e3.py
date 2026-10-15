@@ -85,11 +85,7 @@ def run_e3(mode: str, *, swap: bool) -> dict:
 
 
 def run_suite() -> dict:
-    rows = [
-        run_e3(mode, swap=swap)
-        for mode in ("alias", "immutable")
-        for swap in (False, True)
-    ]
+    rows = [run_e3(mode, swap=swap) for mode in ("alias", "immutable") for swap in (False, True)]
     controls = [row for row in rows if row["scenario"] == "control"]
 
     return {
@@ -97,9 +93,7 @@ def run_suite() -> dict:
         "model": "isolated_in_memory_sqlite",
         "rows": rows,
         "metrics": {
-            "unauthorized_commit_count": sum(
-                row["unauthorized_commit_count"] for row in rows
-            ),
+            "unauthorized_commit_count": sum(row["unauthorized_commit_count"] for row in rows),
             "legitimate_successes": sum(
                 row["authorization_decision"] == "PERMIT"
                 and row["execution_outcome"] == "COMMITTED"

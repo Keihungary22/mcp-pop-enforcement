@@ -56,12 +56,11 @@ def test_begin_immediate_prevents_mapping_update_during_checked_write(tmp_path):
         )
         attacker.commit()
 
-        assert checker.execute(
-            "SELECT resource_id FROM events"
-        ).fetchall() == [("calendar_A",)]
-        assert checker.execute(
-            "SELECT resource_id FROM aliases WHERE alias = 'work'"
-        ).fetchone()[0] == "calendar_B"
+        assert checker.execute("SELECT resource_id FROM events").fetchall() == [("calendar_A",)]
+        assert (
+            checker.execute("SELECT resource_id FROM aliases WHERE alias = 'work'").fetchone()[0]
+            == "calendar_B"
+        )
     finally:
         checker.close()
         attacker.close()
